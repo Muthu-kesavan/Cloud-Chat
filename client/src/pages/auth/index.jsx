@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
-import { InputOTP, InputOTPGroup,InputOTPSeparator,InputOTPSlot,} from "@/components/ui/input-otp"
+import { InputOTP, InputOTPGroup,InputOTPSlot,} from "@/components/ui/input-otp"
 import { useState } from "react"
 import { toast } from "sonner"
 import {apiClient} from "@/lib/api-client";
 import { LOGIN_ROUTE, SIGNUP_ROUTE, VERIFY_OTP } from "@/utils/constants"
 import { useNavigate } from "react-router-dom"
+import { useAppStore } from "@/store"
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const Auth = () => {
   const [isOTPSent, setIsOTPSent] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
+  const {setUserInfo} = useAppStore();
 
   const validateSignup = () => {
     if (!email.length) {
@@ -59,6 +61,7 @@ const Auth = () => {
     try {
       const res = await apiClient.post(VERIFY_OTP, { email, otp, password }, { withCredentials: true });
       if (res.status === 200) {
+        setUserInfo(res.data.user)
         navigate('/profile');
         toast.success("Signup successful!");
       } 
@@ -80,22 +83,29 @@ const Auth = () => {
   };
 
   const handleLogin = async () => {
-    if (!validateLogin()) {
-      return;
-    }
-    try {
-      const res = await apiClient.post(LOGIN_ROUTE, { email, password }, { withCredentials: true });
-      if (res.status === 200) {
-        navigate('/chat');
-        toast.success("Login successful!");
+    if (validateLogin()) {
+      try {
+        const res = await apiClient.post(LOGIN_ROUTE, { email, password }, { withCredentials: true });
+        if (res.status === 200) {
+          if (res.data.user.id){
+            setUserInfo(res.data.user)
+            if (res.data.user.profileSetup){
+              navigate('/chat');
+            }else{
+              navigate('/profile');
+            }
+          }
+          toast.success("Login successful!");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          toast.error(error.response.data || "Invalid email or password");
+        } else {
+          toast.error("An error occurred during login");
+        }
       }
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        toast.error(error.response.data || "Invalid email or password");
-      } else {
-        toast.error("An error occurred during login");
-      }
     }
+    
   };
 
   const handleOtpChange = (otpValue)=> {
@@ -109,7 +119,7 @@ const Auth = () => {
         <div className="flex flex-col gap-10 items-center justify-center">
           <div className="flex items-center justify-center flex-col">
             <div className="flex items-center justify-center">
-              <img src="src/assets/waving-hand.png" alt="emoji" className="h-[100px]" />
+              <img src="src/assets/waving-hand.png" alt="emoji" className="h-[80px]" />
               <h1 className="text-5xl font-bold md:text-6xl"> Welcome</h1>
             </div>
             <p className="font-medium text-center">
@@ -157,9 +167,6 @@ const Auth = () => {
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
                         <InputOTPSlot index={2} />
-                      </InputOTPGroup>
-                      <InputOTPSeparator />
-                      <InputOTPGroup>
                         <InputOTPSlot index={3} />
                         <InputOTPSlot index={4} />
                         <InputOTPSlot index={5} />
