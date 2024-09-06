@@ -161,7 +161,7 @@ const Auth = () => {
                   </>
                 ) : (
                   <>
-                    {/*<Input placeholder="Enter OTP" type="text" className="rounded-full p-6" value={otp} onChange={(e) => setOtp(e.target.value)} /> */}
+                   
                     <InputOTP maxLength={6} value={otp} onChange={handleOtpChange} className="rounded-full p-6">
                     <InputOTPGroup>
                         <InputOTPSlot index={0} />

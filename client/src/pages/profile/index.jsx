@@ -43,7 +43,7 @@ const Profile = () => {
     if (validateProfile()){
       try{
         const res = await apiClient.post(UPDATE_PROFILE, {name, color:selectedColor }, {withCredentials: true});
-        console.log("Profile update response:", res.data)
+        //console.log("Profile update response:", res.data)
         if (res.status === 200 && res.data){
           setUserInfo({...res.data});
           toast.success("Profile updated Successfully");
@@ -69,7 +69,7 @@ const Profile = () => {
 
   const handleImage = async (e) => {
     const file = e.target.files[0];
-    console.log({ file });
+    //console.log({ file });
     if (file) {
       const formData = new FormData();
       formData.append("profile-image", file);
@@ -80,7 +80,7 @@ const Profile = () => {
         if (res.status === 200 && res.data.image) {
           setUserInfo({ ...userInfo, image: res.data.image });
           setImage(`${HOST}/${res.data.image}`); // Update image state with the new URL
-          console.log("Updated user info", res.data);
+          //console.log("Updated user info", res.data);
           toast.success("Image uploaded Successfully");
         }
       } catch (err) {

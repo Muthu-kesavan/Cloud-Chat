@@ -8,7 +8,7 @@ createRoot(document.getElementById('root')).render(
   //<StrictMode>
   <>
     <App />
-    <Toaster  duration={3500} />
+    <Toaster  duration={2500} />
     </>
   //</StrictMode>,
 )
