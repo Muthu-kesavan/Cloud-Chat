@@ -7,7 +7,8 @@ import bcrypt from "bcrypt";
 import {renameSync, unlinkSync} from "fs"
 dotenv.config();
 
-const validTime = 3 * 24 * 60 * 60 * 1000;
+const validTime = 2 * 24 * 60 * 60 * 1000;
+
 const Token = (email, userId) => {
   return jwt.sign({ email, userId }, process.env.JWT, { expiresIn: validTime });
 };

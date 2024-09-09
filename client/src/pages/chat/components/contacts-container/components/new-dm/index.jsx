@@ -47,7 +47,7 @@ const NewDm = () => {
     <TooltipTrigger>
       <FaPlus
       className="text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all duration-300" 
-      onClick={()=>setOpenModal(!openModal)}
+      onClick={()=>setOpenModal(true)}
       />
     </TooltipTrigger>
     <TooltipContent className="bg-[#1c1b1e] border-none mb-2 p-3 text-white">
@@ -84,7 +84,7 @@ const NewDm = () => {
                     <AvatarImage 
                       src={`${HOST}/${cont.image}`} 
                       alt="Profile" 
-                      className="object-cover w-full h-full bg-black" 
+                      className="object-cover w-full h-full bg-black rounded-full" 
                     />
                   ) : (
                     <div className={`uppercase h-12 w-12 text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(cont.color)}`}>

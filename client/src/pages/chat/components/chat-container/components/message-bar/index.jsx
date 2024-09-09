@@ -1,9 +1,15 @@
+import { useAppStore } from '@/store';
+import { useSocket } from '@/context/socketContext';
 import EmojiPicker from 'emoji-picker-react';
 import React, { useEffect, useRef, useState } from 'react'
 import{GrAttachment}from "react-icons/gr"
 import { IoSend } from 'react-icons/io5';
 import { RiEmojiStickerLine } from 'react-icons/ri';
+
+
 const MessageBar = () => {
+  const {selectedChatType, selectedChatData, userInfo} = useAppStore();
+  const socket = useSocket();
   const emojiRef = useRef();
   const [message, setMessage] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false)
@@ -17,13 +23,26 @@ const MessageBar = () => {
     return ()=>{
       document.removeEventListener("mousedown", handleClickOutside)
     }
-   }, [emojiRef])
+   }, [emojiRef]);
+
   const handleEmoji = (emoji)=>{
     setMessage((msg)=>msg+emoji.emoji);
   }
   const handleSendMsg = async()=> {
+    if( selectedChatType === "contact"){
+      socket.emit("sendMessage",{
+        sender:userInfo.id,
+        content: message,
+        recipient: selectedChatData._id,
+        messageType: "text",
+        fileUrl: undefined,
+      });
+      setMessage("");
+    } else{
+      console.log("Socket is not working");
+    }
 
-  }
+  };
   return (
     <div className='h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-6'>
       
@@ -33,8 +52,11 @@ const MessageBar = () => {
         placeholder='Enter Message'
         value={message}
         onChange={(e)=>setMessage(e.target.value)}
+        
         />
-        <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'>
+        <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
+        //onClick={}
+        >
           <GrAttachment className='text-2xl' />
         </button>
         <div className='relative'>
@@ -48,15 +70,16 @@ const MessageBar = () => {
           theme='dark'
           open={emojiOpen} 
           onEmojiClick={handleEmoji} 
-          autoFocusSearch={false} />
+          autoFocusSearch={false} 
+          />
         </div>
         </div>
-        <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
+      </div>
+      <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
         onClick={handleSendMsg}
         >
           <IoSend className='text-[#5201fe] hover:text-[#7A33FF]  text-2xl' />
         </button>
-      </div>
       </div>
   )
 }
