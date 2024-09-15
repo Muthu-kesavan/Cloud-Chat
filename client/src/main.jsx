@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+//import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
@@ -9,7 +9,7 @@ createRoot(document.getElementById('root')).render(
   
   <SocketProvider>
     <App />
-    <Toaster  duration={2500} />
+    <Toaster  duration={1500} />
     </SocketProvider>
     
   //</StrictMode>,
