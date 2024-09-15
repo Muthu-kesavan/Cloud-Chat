@@ -20,6 +20,7 @@ const MessageBar = () => {
   const fileInputRef = useRef();
   const [message, setMessage] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false)
+
    useEffect(()=>{
     function handleClickOutside(e) {
       if (emojiRef.current && !emojiRef.current.contains(e.target)){
@@ -44,10 +45,16 @@ const MessageBar = () => {
         messageType: "text",
         fileUrl: undefined,
       });
-      setMessage("");
-    } else{
-      console.log("Socket is not working");
+    } else if(selectedChatType==="channel"){
+      socket.emit("send-channel-message", {
+        sender:userInfo.id,
+        content: message,
+        messageType: "text",
+        fileUrl: undefined,
+        channelId: selectedChatData._id,
+      });
     }
+    setMessage("");
   };
 
   const handleAttachmentClick =()=>{
@@ -79,7 +86,15 @@ const MessageBar = () => {
               messageType: "file",
               fileUrl: res.data.filePath,
             });
-          } 
+          } else if (selectedChatType === "channel"){
+            socket.emit("send-channel-message", {
+              sender:userInfo.id,
+              content: undefined,
+              messageType: "file",
+              fileUrl: res.data.filePath,
+              channelId: selectedChatData._id,
+            })
+          }
       }
     }
       console.log({file});

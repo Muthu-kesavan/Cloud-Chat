@@ -3,12 +3,8 @@ import { useEffect, useState } from "react"
 import { FaPlus, FaSearch } from "react-icons/fa"
 import { Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-//import Lottie from "react-lottie"
-//import { animationDefaultOptions, getColor } from "@/lib/utils"
 import { apiClient } from "@/lib/api-client"
-import { GET_ALL_CONTACTS } from "@/utils/constants"
-//import { ScrollArea } from "@/components/ui/scroll-area"
-//import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { CREATE_CHANNEL, GET_ALL_CONTACTS } from "@/utils/constants"
 import { useAppStore } from "@/store"
 import { Button } from "@/components/ui/button"
 import MultipleSelector from "@/components/ui/multipleselect"
@@ -16,7 +12,7 @@ import MultipleSelector from "@/components/ui/multipleselect"
 //import { HOST } from "@/utils/constants"
 
 const CreateChannel = () => {
-  const {setSelectedChatType, setSelectedChatData} = useAppStore();
+  const {setSelectedChatType, setSelectedChatData, addChannel} = useAppStore();
   const [newChannelModal, setNewChannelModal] = useState(false);
   const [contact, setContact] = useState([]);
   const [allContacts, setAllContacts] = useState([]);
@@ -35,6 +31,25 @@ const CreateChannel = () => {
   },[])
 
   const createChannel = async()=>{
+    try{
+      if (channelName.length > 0 && selectedContacts.length > 0) {
+        const res = await apiClient.post(CREATE_CHANNEL,{
+          name: channelName,
+          members: selectedContacts.map((contact)=> contact.value),
+        },{ withCredentials: true}
+      )
+      if(res.status === 201){
+        setChannelName("");
+        setSelectedContacts([]);
+        setNewChannelModal(false);
+        addChannel(res.data.channel);
+        
+      }
+    };
+      
+    }catch(err){
+      console.log({err});
+    }
 
   };
   return (

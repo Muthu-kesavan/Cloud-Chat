@@ -68,7 +68,7 @@ const ContactList = ({ contacts = [], isChannel = false }) => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <span>{`${contact.name}`}</span>
+                    <span>{contact.name ? `${contact.name}` :`${contact.email}`}</span>
                   </div>)
               }         
           </div>

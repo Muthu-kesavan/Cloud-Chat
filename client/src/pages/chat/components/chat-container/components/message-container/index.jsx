@@ -3,10 +3,12 @@ import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import './messageContainer.css';
 import { apiClient } from "@/lib/api-client";
-import { GET_MESSAGES, HOST } from "@/utils/constants";
+import { GET_CHANNEL_MESSAGES, GET_MESSAGES, HOST } from "@/utils/constants";
 import {MdFolderZip} from "react-icons/md";
 import { IoMdArrowDown } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
+import { getColor } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const MessageContainer = () => {
   const scrollRef = useRef();
   const { 
@@ -32,12 +34,25 @@ const MessageContainer = () => {
       }
 
     }
-    if(selectedChatData._id){
-      if(selectedChatType === 'contact'){
-        getMessages();
+    const getChannelMessages = async()=>{
+      try{
+        const res = await apiClient.get(
+          `${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`,
+          {withCredentials: true}
+        );
+        if(res.data.messages) {
+          setSelectedChatMessages(res.data.messages);
+        }
+      }catch(err){
+        console.log({err});
       }
-      }
+    }
 
+
+    if(selectedChatData._id){
+      if(selectedChatType === 'contact') getMessages();
+      else if (selectedChatType === 'channel')getChannelMessages();
+    }
   },[selectedChatData, selectedChatType, setSelectedChatMessages])
   
   //console.log("Selected Chat Messages:", selectedChatMessages);
@@ -72,9 +87,8 @@ const MessageContainer = () => {
               {moment(message.timestamp).format("LL")}
             </div>
           )}
-
-          
           {selectedChatType === "contact" && renderDmMessages(message)}
+          {selectedChatType === "channel" && renderChannelMessages(message)}
         </div>
       );
     });
@@ -99,7 +113,7 @@ const MessageContainer = () => {
     link.click();
     link.remove();
     window.URL.revokeObjectURL(urlBlob);
-    setIsDownlaoding(false);
+    setIsDownloading(false);
     setFileDownloadProgress(0);
   };
   
@@ -153,13 +167,108 @@ const MessageContainer = () => {
           )}
           </div>
         )}
-  
         <div className="text-xs text-gray-600">
           {moment(message.timestamp).format("LT")}
         </div>
       </div>
     );
   };
+  
+  const renderChannelMessages = (message, previousMessage) => {
+    // Determine margin based on message type and position
+    const messageMarginTop = previousMessage && previousMessage.messageType !== message.messageType
+      ? "mt-4" // Add more space if message type changes (e.g., text to file)
+      : "mt-2"; // Default margin
+  
+    return (
+      <div className={`flex flex-col items-start gap-2 ${message.sender._id === userInfo.id ? "items-end" : "items-start"} ${messageMarginTop}`}>
+        {message.sender._id !== userInfo.id && (
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8 rounded-full overflow-hidden">
+              {message.sender.image ? (
+                <AvatarImage
+                  src={`${HOST}/${message.sender.image}`}
+                  alt="Profile"
+                  className="object-cover w-full h-full bg-black"
+                />
+              ) : (
+                <AvatarFallback
+                  className={`uppercase h-8 w-8 text-lg flex items-center justify-center rounded-full ${getColor(
+                    message.sender.color
+                  )}`}
+                >
+                  {message.sender.name
+                    ? message.sender.name.charAt(0)
+                    : message.sender.email.charAt(0)}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <span className="text-sm text-white/60">{message.sender.name}</span>
+          </div>
+        )}
+  
+        {message.messageType === "text" && (
+          <div
+            className={`${
+              message.sender._id === userInfo.id
+                ? "bg-receiverBubble text-receiverText border-receiverBorder"
+                : "bg-senderBubble text-senderText border-senderBorder"
+            } message-bubble p-3 rounded-lg relative ml-9`}
+          >
+            {message.content}
+            <span className="text-xs text-white/60 mt-1 block text-right">
+              {moment(message.timestamp).format("LT")}
+            </span>
+          </div>
+        )}
+  
+        {message.messageType === "file" && (
+          <div
+            className={`${
+              message.sender._id !== userInfo.id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble `} // Added margin-bottom for spacing between file messages
+          >
+            {checkImage(message.fileUrl) ? (
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  setShowImage(true);
+                  setImageUrl(message.fileUrl);
+                }}
+              >
+                <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
+                  <MdFolderZip />
+                </span>
+                <span>{message.fileUrl.split("/").pop()}</span>
+                <span
+                  className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all"
+                  onClick={() => downloadFile(message.fileUrl)}
+                >
+                  <IoMdArrowDown />
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+  
+        {/* Timestamp for non-text messages, outside the bubble */}
+        {message.messageType !== "text" && (
+          <div className="text-xs text-gray-600"> {/* Added margin-top for spacing */}
+            {moment(message.timestamp).format("LT")}
+          </div>
+        )}
+      </div>
+    );
+  };
+  
+  
+  
   
 
   return (
