@@ -1,5 +1,6 @@
 export const HOST = import.meta.env.VITE_SERVER_URL;
 
+
 export const AUTH_ROUTES = "api/auth";
 export const SIGNUP_ROUTE = `${AUTH_ROUTES}/signup`
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`
@@ -10,8 +11,15 @@ export const UPLOAD_IMAGE = `${AUTH_ROUTES}/upload-image`
 export const REMOVE_IMAGE = `${AUTH_ROUTES}/remove-image`
 export const LOGOUT = `${AUTH_ROUTES}/logout`
 
+
+
 export const CONTACT_ROUTES = "api/contacts"
 export const SEARCH_CONTACTS = `${CONTACT_ROUTES}/search`
 export const GET_DM_CONTACTS_ROUTES = `${CONTACT_ROUTES}/get-contacts-for-dm`
+export const GET_ALL_CONTACTS = `${CONTACT_ROUTES}/get-all-contacts`
+
+
+
 export const MESSAGE_ROUTES = "api/messages"
 export const GET_MESSAGES = `${MESSAGE_ROUTES}/get-messages`
+export const UPLOAD_FILE = `${MESSAGE_ROUTES}/upload`

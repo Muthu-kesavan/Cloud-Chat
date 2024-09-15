@@ -1,18 +1,24 @@
 import { useAppStore } from "@/store";
 import moment from "moment";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import './messageContainer.css';
 import { apiClient } from "@/lib/api-client";
-import { GET_MESSAGES } from "@/utils/constants";
-
+import { GET_MESSAGES, HOST } from "@/utils/constants";
+import {MdFolderZip} from "react-icons/md";
+import { IoMdArrowDown } from "react-icons/io";
+import { IoCloseSharp } from "react-icons/io5";
 const MessageContainer = () => {
   const scrollRef = useRef();
   const { 
+    setFileDownloadProgress,
+    setIsDownloading,
     selectedChatType, 
     selectedChatData, 
     selectedChatMessages, 
     setSelectedChatMessages, 
     userInfo } = useAppStore();
+  const [showImage, setShowImage] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
 
   useEffect(()=>{
     const getMessages = async ()=>{
@@ -44,7 +50,11 @@ const MessageContainer = () => {
     }
   }, [selectedChatMessages]);
 
-  
+  const checkImage =(filePath)=> {
+    const imageRegex =  /\.(jpg|jpeg|png|gif|bmp|tiff|webp|svg|ico|heic|heif)$/i;
+    return imageRegex.test(filePath);
+  };
+
   const renderMessages = () => {
     let lastDate = null;
 
@@ -70,34 +80,112 @@ const MessageContainer = () => {
     });
   };
 
+  const downloadFile = async(url)=>{
+    setIsDownloading(true);
+    setFileDownloadProgress(0);
+    const res = await apiClient.get(`${HOST}/${url}`,{
+      responseType: "Blob",
+      onDownloadProgress:(progressEvent)=>{
+        const {loaded, total}= progressEvent;
+        const percentComplete = Math.round((loaded*100)/ total);
+        setFileDownloadProgress(percentComplete);
+      }
+    });
+    const urlBlob = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href =  urlBlob;
+    link.setAttribute("download", url.split("/").pop());
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(urlBlob);
+    setIsDownlaoding(false);
+    setFileDownloadProgress(0);
+  };
   
   const renderDmMessages = (message) => {
-    //console.log("Rendering DM Message:", message);
-
     return (
-      <div className={`${message.sender === selectedChatData._id ? "text-left rounded-full" : "text-right rounded-full"}`}>
+      <div
+        className={`${
+          message.sender === selectedChatData._id
+            ? "text-left rounded-full"
+            : "text-right rounded-full"
+        }`}
+      >
         {message.messageType === "text" && (
           <div
             className={`${
               message.sender !== selectedChatData._id
-              ? "bg-senderBubble text-senderText border-senderBorder"
-              : "bg-receiverBubble text-receiverText border-receiverBorder"
-          } message-bubble`}
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
           >
             {message.content}
           </div>
         )}
+  
+        {message.messageType === "file" && (
+          <div
+            className={`${
+              message.sender !== selectedChatData._id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
+          >
+            {checkImage(message.fileUrl) ? (<div className="cursor-pointer"
+             onClick={()=>{
+              setShowImage(true)
+              setImageUrl(message.fileUrl);
+             }}
+             >
+              <img src={`${HOST}/${message.fileUrl}`} height={300} width={300}/>
+            </div>
+             ) :(
+            <div className="flex items-center justify-center gap-4">
+              <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
+              <MdFolderZip />
+              </span>
+              <span>{message.fileUrl.split("/").pop()}</span>
+              <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={()=> downloadFile(message.fileUrl)}>
+              <IoMdArrowDown />
+              </span>
+            </div>
+          )}
+          </div>
+        )}
+  
         <div className="text-xs text-gray-600">
           {moment(message.timestamp).format("LT")}
         </div>
       </div>
     );
   };
+  
 
   return (
     <div className="flex-1 overflow-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lh:w-[70vw] xl:w-[80vw] w-full">
       {renderMessages()}
       <div ref={scrollRef} />
+      {
+        showImage && <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
+          <div>
+            <img src={`${HOST}/${imageUrl}`} className="h-[80vh] w-full bg-cover"/>
+          </div>
+          <div className="flex gap-5 fixed top-0 mt-5">
+            <button className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+            onClick={()=> downloadFile(imageUrl)}>
+              <IoMdArrowDown />
+            </button>
+            <button className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+            onClick={()=> {
+              setShowImage(false)
+              setImageUrl(null);
+            }}>
+              <IoCloseSharp />
+            </button>
+          </div>
+        </div>
+      }
     </div>
   );
 };
