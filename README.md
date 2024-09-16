@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/Frontend-React-blue)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js-orange)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)](https://www.mongodb.com/)
-[![License](https://img.shields.io/github/license/Muthu-kesavan/cloudChat)](LICENSE)
+
 
 > **CloudChat** is a feature-rich messaging platform that allows users to communicate in **one-on-one** and **group chats**, share images, files, and text messages, and securely sign up with **OTP verification**.
 
@@ -45,3 +45,4 @@
    ```bash
    https://github.com/Muthu-kesavan/Cloud-Chat.git
    cd CloudChat
+   ```
