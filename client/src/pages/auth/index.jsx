@@ -8,7 +8,7 @@ import {apiClient} from "@/lib/api-client";
 import { LOGIN_ROUTE, SIGNUP_ROUTE, VERIFY_OTP } from "@/utils/constants"
 import { useNavigate } from "react-router-dom"
 import { useAppStore } from "@/store"
-
+import bgimage3 from "../../assets/bgimage3.webp";
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,8 +111,6 @@ const Auth = () => {
   const handleOtpChange = (otpValue)=> {
     setOtp(otpValue)
   }
-  
-  
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">
       <div className="h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70wv] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2 ">
@@ -180,6 +178,9 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
           </div>
+        </div>
+        <div className="hidden xl:flex justify-center items-center">
+              <img src={bgimage3} alt="image" className="h-[500px] w-[600px] rounded-lg" />
         </div>
       </div>
     </div>
