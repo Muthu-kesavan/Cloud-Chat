@@ -116,12 +116,12 @@ const NewDm = () => {
           width={100}
           options={animationDefaultOptions}
         />
-        <div className="text-opacity-80 text-white flex flex-col gap-5 items-center mt-5 lg:text-2xl text-xl transition-all duration-300 text-center">
+        {/* <div className="text-opacity-80 text-white flex flex-col gap-5 items-center mt-5 lg:text-2xl text-xl transition-all duration-300 text-center">
           <h3 className="inline-flex items-center">
             <FaSearch className="mr-2" /> Search New&nbsp;
             <span className="font-bold text-[#5A00EE]">Contacts</span>
           </h3>
-        </div>
+        </div> */}
       </div>
     )}
   </DialogContent>
