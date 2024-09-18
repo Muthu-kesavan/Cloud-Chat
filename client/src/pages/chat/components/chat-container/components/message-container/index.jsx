@@ -9,6 +9,8 @@ import { IoMdArrowDown } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
 import { getColor } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Linkify from "react-linkify";
+
 const MessageContainer = () => {
   const scrollRef = useRef();
   const { 
@@ -79,6 +81,7 @@ const MessageContainer = () => {
       lastDate = messageDate;
 
       //console.log("Rendering message:", message.content);
+  
 
       return (
         <div key={index}>
@@ -126,6 +129,7 @@ const MessageContainer = () => {
             : "text-right rounded-full"
         }`}
       >
+        
         {message.messageType === "text" && (
           <div
             className={`${
@@ -134,7 +138,9 @@ const MessageContainer = () => {
                 : "bg-receiverBubble text-receiverText border-receiverBorder"
             } message-bubble`}
           >
+            <Linkify>
             {message.content}
+            </Linkify>
           </div>
         )}
   
@@ -175,10 +181,9 @@ const MessageContainer = () => {
   };
   
   const renderChannelMessages = (message, previousMessage) => {
-    // Determine margin based on message type and position
     const messageMarginTop = previousMessage && previousMessage.messageType !== message.messageType
-      ? "mt-4" // Add more space if message type changes (e.g., text to file)
-      : "mt-2"; // Default margin
+      ? "mt-4" 
+      : "mt-2"; 
   
     return (
       <div className={`flex flex-col items-start gap-2 ${message.sender._id === userInfo.id ? "items-end" : "items-start"} ${messageMarginTop}`}>
@@ -215,7 +220,9 @@ const MessageContainer = () => {
                 : "bg-senderBubble text-senderText border-senderBorder"
             } message-bubble p-3 rounded-lg relative ml-9`}
           >
+            <Linkify>
             {message.content}
+            </Linkify>
             <span className="text-xs text-white/60 mt-1 block text-right">
               {moment(message.timestamp).format("LT")}
             </span>
@@ -228,7 +235,7 @@ const MessageContainer = () => {
               message.sender._id !== userInfo.id
                 ? "bg-senderBubble text-senderText border-senderBorder"
                 : "bg-receiverBubble text-receiverText border-receiverBorder"
-            } message-bubble `} // Added margin-bottom for spacing between file messages
+            } message-bubble `} 
           >
             {checkImage(message.fileUrl) ? (
               <div

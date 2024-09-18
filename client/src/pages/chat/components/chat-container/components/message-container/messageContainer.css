@@ -13,11 +13,11 @@
 }
 
 .text-senderText {
-  color: #5A00EE;
+  color: #ffffff;
 }
 
 .border-senderBorder {
-  border-color: #8417ff80;
+  border-color: #5A00EE;
 }
 
 .bg-receiverBubble {
@@ -31,3 +31,4 @@
 .border-receiverBorder {
   border-color: #ffffff33;
 }
+
