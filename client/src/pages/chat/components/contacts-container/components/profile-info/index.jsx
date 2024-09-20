@@ -105,7 +105,6 @@ const ProfileInfo = () => {
         </TooltipProvider>
       </div>
 
-      {/* Modal Component */}
       {isModalOpen && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
     <div className=" bg-[#5201fe] rounded-lg p-6 shadow-lg max-w-md w-full">

@@ -71,7 +71,7 @@ const NewDm = () => {
       />
     </div>
       {contact.length > 0 && (
-        <ScrollArea className="h-[250px] flex-grow mt-4">
+        <ScrollArea className="h-[250px] w-full flex-grow mt-4 bg-[#1E1E1E] border border-[#3A3A3A] rounded-lg overflow-hidden">
         <div className="flex flex-col gap-5">
           {contact.map((cont) => (
             <div 
